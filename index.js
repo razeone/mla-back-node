@@ -7,30 +7,36 @@ app.use(cors());
 
 const port = 3001
 const url = 'https://api.mercadolibre.com/sites/MLA/search';
+let cacheObj = {};
 
 app.get('/api/search', (req, res) => {
     let finalUrl = buildUrl(req.query.query, req.query.sort, req.query.filter)
     let result = '';
-    console.log(finalUrl)
 
-    get(finalUrl, (resp) => {
-        resp.on('data', (chunk) => {
-            result += chunk;
+    res.set('Content-Type', 'application/json');
+
+    if(cacheObj[finalUrl]) {
+        console.log('Cache hit');
+        res.send(cacheObj[finalUrl])
+    } else {
+        get(finalUrl, (resp) => {
+            resp.on('data', (chunk) => {
+                result += chunk;
+            });
+            resp.on('end', () => {
+                cacheObj[finalUrl] = parseResult(result)
+                res.send(cacheObj[finalUrl]);
+            }).on('error', (err) => {
+                console.error(err);
+            });
         });
-        resp.on('end', () => {
-            res.set('Content-Type', 'application/json');
-            res.send(parseResult(result));
-        }).on('error', (err) => {
-            console.error(err);
-        });
-    });
+    }
 });
 
 function buildUrl(query, sortOption, filter) {
     query = (query) ? '?q=' + query  : '?q=""'
     sortOption = (sortOption) ? '&sort=' + sortOption : ''
     filter = (filter) ? '&ITEM_CONDITION=' + filter : ''
-    console.log(filter)
     return url + query + sortOption + filter;
 }
 
