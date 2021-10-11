@@ -12,13 +12,13 @@ let cacheObj = {};
 app.get('/api/search', (req, res) => {
     let finalUrl = buildUrl(req.query.query, req.query.sort, req.query.filter)
     let result = '';
-
     res.set('Content-Type', 'application/json');
 
     if(cacheObj[finalUrl]) {
         console.log('Cache hit');
         res.send(cacheObj[finalUrl])
     } else {
+	console.log('Cache missm get the data');
         get(finalUrl, (resp) => {
             resp.on('data', (chunk) => {
                 result += chunk;
