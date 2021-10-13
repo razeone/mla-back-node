@@ -1,5 +1,7 @@
 # mla-back-node
 
+[![Build Status](https://app.travis-ci.com/razeone/mla-back-node.svg?branch=main)](https://app.travis-ci.com/razeone/mla-back-node)
+
 ### Quickstart
 
 ```sh
