@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mla-back
+  name: mla-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mla-back
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mla-back
+    spec:
+      containers:
+      - image: quay.io/jorge_alcaraz_ibm/mla-back-node:v1
+        name: mla-back-node
+        resources: {}
+status: {}

@@ -5,7 +5,7 @@ import cors from 'cors';
 let app = express();
 app.use(cors());
 
-const port = 3001
+const port = process.env.port || 3001;
 const url = 'https://api.mercadolibre.com/sites/MLA/search';
 let cacheObj = {};
 
@@ -18,7 +18,7 @@ app.get('/api/search', (req, res) => {
         console.log('Cache hit');
         res.send(cacheObj[finalUrl])
     } else {
-	console.log('Cache missm get the data');
+	    console.log('Cache miss get the data');
         get(finalUrl, (resp) => {
             resp.on('data', (chunk) => {
                 result += chunk;
@@ -42,8 +42,7 @@ function buildUrl(query, sortOption, filter) {
 
 function parseResult(result) {
     let jsonResult = JSON.parse(result).results;
-    let finalResult = []
-    jsonResult.forEach(element => {
+    let finalResult = jsonResult.map(element => {
         let objTemplate = {
             'id': element.id,
             'title': element.title,
@@ -53,7 +52,7 @@ function parseResult(result) {
             'thumbnail': element.thumbnail,
             'condition': element.condition
         }
-        finalResult.push(objTemplate);
+        return objTemplate
     })
     return finalResult;
 }
@@ -61,3 +60,4 @@ function parseResult(result) {
 app.listen(port, () => {
     console.log('Listening on port ' + port);
 });
+
