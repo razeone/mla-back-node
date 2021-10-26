@@ -5,8 +5,8 @@ import cors from 'cors';
 let app = express();
 app.use(cors());
 
-const port = process.env.port || 3001;
-const url = 'https://api.mercadolibre.com/sites/MLA/search';
+const PORT = process.env.port || 3001;
+const URL = 'https://api.mercadolibre.com/sites/MLA/search';
 let cacheObj = {};
 
 app.get('/api/search', (req, res) => {
@@ -37,12 +37,11 @@ function buildUrl(query, sortOption, filter) {
     query = (query) ? '?q=' + query  : '?q=""'
     sortOption = (sortOption) ? '&sort=' + sortOption : ''
     filter = (filter) ? '&ITEM_CONDITION=' + filter : ''
-    return url + query + sortOption + filter;
+    return URL + query + sortOption + filter;
 }
 
 function parseResult(result) {
-    let jsonResult = JSON.parse(result).results;
-    return jsonResult.map(element => {
+    return JSON.parse(result).results.map(element => {
         return {
             'id': element.id,
             'title': element.title,
@@ -55,7 +54,6 @@ function parseResult(result) {
     });
 }
 
-app.listen(port, () => {
-    console.log('Listening on port ' + port);
+app.listen(PORT, () => {
+    console.log('Listening on port ' + PORT);
 });
-
