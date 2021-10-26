@@ -1,9 +1,6 @@
-import express from 'express';
 import { get } from 'https';
-import cors from 'cors';
+import { app } from './app.js';
 
-let app = express();
-app.use(cors());
 
 const PORT = process.env.port || 3001;
 const URL = 'https://api.mercadolibre.com/sites/MLA/search';
