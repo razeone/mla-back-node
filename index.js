@@ -42,8 +42,8 @@ function buildUrl(query, sortOption, filter) {
 
 function parseResult(result) {
     let jsonResult = JSON.parse(result).results;
-    let finalResult = jsonResult.map(element => {
-        let objTemplate = {
+    return jsonResult.map(element => {
+        return {
             'id': element.id,
             'title': element.title,
             'price': element.price,
@@ -52,9 +52,7 @@ function parseResult(result) {
             'thumbnail': element.thumbnail,
             'condition': element.condition
         }
-        return objTemplate
-    })
-    return finalResult;
+    });
 }
 
 app.listen(port, () => {
