@@ -1,7 +1,6 @@
 import { get } from 'https';
 import { app } from './app.js';
 
-
 const PORT = process.env.port || 3001;
 const URL = 'https://api.mercadolibre.com/sites/MLA/search';
 let cacheObj = {};
