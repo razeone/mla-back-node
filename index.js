@@ -5,7 +5,7 @@ import cors from 'cors';
 let app = express();
 app.use(cors());
 
-const PORT = process.env.port || 3001;
+const PORT = process.env.NODE_PORT || 3001;
 const URL = 'https://api.mercadolibre.com/sites/MLA/search';
 let cacheObj = {};
 
