@@ -1,8 +1,19 @@
 import { get } from 'https';
-import { app } from './app.js';
+import redis from 'redis';
 
-const PORT = process.env.port || 3001;
-const URL = 'https://api.mercadolibre.com/sites/MLA/search';
+import { app } from './app.js';
+import { PORT, URL } from './config.js';
+
+const client = redis.createClient(6379, '127.0.0.1'); //creates a new client
+
+client.on('connect', () => {
+    console.log('connected');
+});
+
+client.on("error", (err) => {
+    console.log(err);
+});
+// TODO: Refactor this object into a redis cache
 let cacheObj = {};
 
 app.get('/api/search', (req, res) => {
@@ -10,8 +21,39 @@ app.get('/api/search', (req, res) => {
     let result = '';
     res.set('Content-Type', 'application/json');
 
+    try{
+        client.get(finalUrl, async (err, results) => {
+            if (err) throw err;
+            
+            if(results){
+                console.log('cache hit');
+                res.send(JSON.parse(results));
+            }
+            else{
+                console.log('cache miss');
+                get(finalUrl, (resp) => {
+                    resp.on('data', (chunk) => {
+                        result += chunk;
+                    });
+                    resp.on('end', () => {
+                        cacheObj[finalUrl] = parseResult(result);
+                        res.send(cacheObj[finalUrl]);
+                        client.set(finalUrl, JSON.stringify(cacheObj[finalUrl]));
+                    }).on('error', (error) => {
+                        console.error(error);
+                    });
+                });
+            }
+
+        });
+    } catch(err) {
+        console.log(err);
+    }
+
+    /*
     if(cacheObj[finalUrl]) {
         console.log('Cache hit');
+
         res.send(cacheObj[finalUrl])
     } else {
 	    console.log('Cache miss get the data');
@@ -20,13 +62,15 @@ app.get('/api/search', (req, res) => {
                 result += chunk;
             });
             resp.on('end', () => {
-                cacheObj[finalUrl] = parseResult(result)
+                cacheObj[finalUrl] = parseResult(result);
                 res.send(cacheObj[finalUrl]);
+                client.set(finalUrl, JSON.stringify(cacheObj[finalUrl]));
             }).on('error', (err) => {
                 console.error(err);
             });
         });
     }
+    */
 });
 
 function buildUrl(query, sortOption, filter) {
