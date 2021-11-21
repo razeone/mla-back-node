@@ -2,14 +2,14 @@
 
 [![Build Status](https://app.travis-ci.com/razeone/mla-back-node.svg?branch=main)](https://app.travis-ci.com/razeone/mla-back-node)
 
-### Quickstart
+## Quickstart
 
 ```sh
 npm install
 node index.js
 ```
 
-### Quickstart Docker
+## Quickstart Docker
 
 ```sh
 docker build . -t mla-back-node:v1
