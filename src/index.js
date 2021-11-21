@@ -1,20 +1,10 @@
 import { get } from 'https';
-import redis from 'redis';
 
-import { app } from './app.js';
-import { PORT, URL } from './config.js';
+import { app, redisClient } from './app.js';
+import { URL } from './config.js';
 
-const client = redis.createClient(6379, '127.0.0.1'); //creates a new client
+const client = redisClient;
 
-client.on('connect', () => {
-    console.log('connected');
-});
-
-client.on("error", (err) => {
-    console.log(err);
-});
-// TODO: Refactor this object into a redis cache
-let cacheObj = {};
 
 app.get('/api/search', (req, res) => {
     let finalUrl = buildUrl(req.query.query, req.query.sort, req.query.filter)
@@ -36,9 +26,9 @@ app.get('/api/search', (req, res) => {
                         result += chunk;
                     });
                     resp.on('end', () => {
-                        cacheObj[finalUrl] = parseResult(result);
-                        res.send(cacheObj[finalUrl]);
-                        client.set(finalUrl, JSON.stringify(cacheObj[finalUrl]));
+                        let parsed_result = parseResult(result);
+                        res.send(parsed_result);
+                        client.set(finalUrl, JSON.stringify(parsed_result));
                     }).on('error', (error) => {
                         console.error(error);
                     });
@@ -50,27 +40,6 @@ app.get('/api/search', (req, res) => {
         console.log(err);
     }
 
-    /*
-    if(cacheObj[finalUrl]) {
-        console.log('Cache hit');
-
-        res.send(cacheObj[finalUrl])
-    } else {
-	    console.log('Cache miss get the data');
-        get(finalUrl, (resp) => {
-            resp.on('data', (chunk) => {
-                result += chunk;
-            });
-            resp.on('end', () => {
-                cacheObj[finalUrl] = parseResult(result);
-                res.send(cacheObj[finalUrl]);
-                client.set(finalUrl, JSON.stringify(cacheObj[finalUrl]));
-            }).on('error', (err) => {
-                console.error(err);
-            });
-        });
-    }
-    */
 });
 
 function buildUrl(query, sortOption, filter) {
@@ -94,6 +63,3 @@ function parseResult(result) {
     });
 }
 
-app.listen(PORT, () => {
-    console.log('Listening on port ' + PORT);
-});
