@@ -10,13 +10,12 @@ const getRedisClient = (host, port) => {
 export const redisClient = getRedisClient(REDIS_HOST, REDIS_PORT);
 
 redisClient.on('connect', () => {
-    console.log('Redis connected');
+    console.info('INFO: Redis connected');
 });
 
 redisClient.on("error", (err) => {
-    console.log(err);
+    console.error(err);
 });
-
 
 export const app = express();
 
@@ -25,5 +24,5 @@ app.use(cors());
 app.options('*', cors());
 
 app.listen(PORT, () => {
-    console.log('Listening on port ' + PORT);
+    console.info('INFO: Listening on port ' + PORT);
 });
